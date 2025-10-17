@@ -1,14 +1,190 @@
+// ============================================================================
+//         PROJETO FREE FIRE - DESAFIO DE CÓDIGO
+// ============================================================================
+//        
+// ============================================================================
+//
+// OBJETIVOS:
+// - Simular o gerenciamento avançado de uma mochila com componentes coletados durante a fuga de uma ilha.
+// - Introduzir ordenação com critérios e busca binária para otimizar a gestão dos recursos.
+//
+// ============================================================================
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
-// Código da Ilha – Edição Free Fire
-// Nível: Mestre
-// Este programa simula o gerenciamento avançado de uma mochila com componentes coletados durante a fuga de uma ilha.
-// Ele introduz ordenação com critérios e busca binária para otimizar a gestão dos recursos.
+// --- Constantes Globais ---
+#define MAX_ITENS 10
+
+// --- Estrutura de Dados ---
+// Estrutura que representa um item da mochila
+typedef struct {
+    char nome[30];
+    char tipo[20]; 
+    int quantidade;
+} Item;
+
+// Estrutura da lista estática (vetor fixo de até 10 itens)
+typedef struct {
+    Item itens[MAX_ITENS];
+    int quantidade;
+} ListaEstatica;
+
+
+// ==== FUNÇÕES LISTA ESTÁTICA ====
+
+void inicializarListaEstatica(ListaEstatica *lista) {
+    lista->quantidade = 0;
+}
+
+// Inserir item
+void inserirItem(ListaEstatica *lista, Item novo) {
+    if (lista->quantidade == MAX_ITENS) {
+        printf("Erro: A mochila está cheia!\n");
+        return;
+    }
+    lista->itens[lista->quantidade] = novo;
+    lista->quantidade++;
+    printf("Item '%s' inserido com sucesso.\n", novo.nome);
+}
+
+// Remover item por nome
+void removerItem(ListaEstatica *lista, const char* nome) {
+    int i, pos = -1;
+
+    for (i = 0; i < lista->quantidade; i++) {
+        if (strcmp(lista->itens[i].nome, nome) == 0) {
+            pos = i;
+            break;
+        }
+    }
+
+    if (pos == -1) {
+        printf("Erro: Item '%s' não encontrado na mochila.\n", nome);
+        return;
+    }
+
+    for (i = pos; i < lista->quantidade - 1; i++) {
+        lista->itens[i] = lista->itens[i + 1];
+    }
+
+    lista->quantidade--;
+    printf("Item '%s' removido com sucesso.\n", nome);
+}
+
+// Listar todos os itens
+void listarItens(const ListaEstatica *lista) {
+    int i;
+    if (lista->quantidade == 0) {
+        printf("A mochila está vazia.\n");
+        return;
+    }
+
+    printf("\n=== Itens na mochila ===\n");
+    for (i = 0; i < lista->quantidade; i++) {
+        printf("Nome: %s | Tipo: %s | Quantidade: %d\n",
+               lista->itens[i].nome,
+               lista->itens[i].tipo,
+               lista->itens[i].quantidade);
+    }
+    printf("========================\n");
+}
+
+// Buscar item por nome
+void buscarItem(const ListaEstatica *lista, const char* nome) {
+    int i;
+    for (i = 0; i < lista->quantidade; i++) {
+        if (strcmp(lista->itens[i].nome, nome) == 0) {
+            printf("Item encontrado: Nome: %s | Tipo: %s | Quantidade: %d\n",
+                   lista->itens[i].nome,
+                   lista->itens[i].tipo,
+                   lista->itens[i].quantidade);
+            return;
+        }
+    }
+    printf("Item '%s' não encontrado na mochila.\n", nome);
+}
+
+// ==== MENU ====
+void menuListaEstatica() {
+    ListaEstatica mochila;
+    inicializarListaEstatica(&mochila);
+
+    int opcao;
+    do {
+        printf("\n--- MOCHILA DO JOGADOR (Lista Estática) ---\n");
+        printf("1. Inserir item\n");
+        printf("2. Remover item\n");
+        printf("3. Listar itens\n");
+        printf("4. Buscar item\n");
+        printf("0. Voltar\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+        getchar(); // consumir \n
+
+        if (opcao == 1) {
+            Item novo;
+            printf("Digite o nome do item: ");
+            fgets(novo.nome, sizeof(novo.nome), stdin);
+            novo.nome[strcspn(novo.nome, "\n")] = '\0';
+
+            printf("Digite o tipo do item: ");
+            fgets(novo.tipo, sizeof(novo.tipo), stdin);
+            novo.tipo[strcspn(novo.tipo, "\n")] = '\0';
+
+            printf("Digite a quantidade: ");
+            scanf("%d", &novo.quantidade);
+            getchar();
+
+            inserirItem(&mochila, novo);
+
+        } else if (opcao == 2) {
+            char nome[30];
+            printf("Digite o nome do item a remover: ");
+            fgets(nome, sizeof(nome), stdin);
+            nome[strcspn(nome, "\n")] = '\0';
+            removerItem(&mochila, nome);
+
+        } else if (opcao == 3) {
+            listarItens(&mochila);
+
+        } else if (opcao == 4) {
+            char nome[30];
+            printf("Digite o nome do item a buscar: ");
+            fgets(nome, sizeof(nome), stdin);
+            nome[strcspn(nome, "\n")] = '\0';
+            buscarItem(&mochila, nome);
+
+        } else if (opcao == 0) {
+            printf("Voltando ao menu principal...\n");
+        } else {
+            printf("Opção inválida!\n");
+        }
+
+    } while (opcao != 0);
+}
 
 int main() {
+    int opcao;
+    do {
+        printf("\n--- INVENTÁRIO DO JOGADOR ---\n");
+        printf("1. Lista Estática (mochila)\n");
+        printf("0. Sair\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+        getchar();
+
+        if (opcao == 1) {
+            menuListaEstatica();
+        } else if (opcao == 0) {
+            printf("Saindo...\n");
+        } else {
+            printf("Opção inválida!\n");
+        }
+
+    } while (opcao != 0);
     // Menu principal com opções:
     // 1. Adicionar um item
     // 2. Remover um item
